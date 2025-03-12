@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Star } from "lucide-react";
 import images from "../assets/image";
-import { useCart } from "./CartContext";
+import { useCart } from "../components/CartContext";
 
 const recipes = [
     {
@@ -89,7 +89,6 @@ const RecipeBoxPage = () => {
     const { addToCart } = useCart();
     return (
         <div className="container mx-auto px-4 py-8">
-            {/* Profile Section */}
             <div className="flex items-center space-x-6 mb-8">
                 <motion.img
                     src={images().avatar}
@@ -118,8 +117,6 @@ const RecipeBoxPage = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Category Filters */}
             <div className="flex space-x-4 mb-6">
                 {categories.map((category) => (
                     <button
@@ -135,8 +132,6 @@ const RecipeBoxPage = () => {
                     </button>
                 ))}
             </div>
-
-            {/* Recipes Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {filteredRecipes.map((recipe) => (
                     <motion.div
@@ -193,8 +188,6 @@ const RecipeBoxPage = () => {
                     </motion.div>
                 ))}
             </div>
-
-            {/* Pagination */}
             <div className="flex justify-center items-center space-x-4 mt-8 bg-gray-100 rounded-full p-2 w-64 mx-auto">
                 <button className="text-gray-600 hover:text-pink-500">
                     {"<"}

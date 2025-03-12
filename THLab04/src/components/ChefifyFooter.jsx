@@ -6,7 +6,6 @@ const ChefifyFooter = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="container mx-auto px-4 grid md:grid-cols-4 gap-8">
-        {/* About Us Section */}
         <div>
           <h4 className="text-xl font-bold mb-4">About Us</h4>
           <p className="text-gray-400 mb-4">
@@ -27,8 +26,6 @@ const ChefifyFooter = () => {
             </button>
           </div>
         </div>
-
-        {/* Learn More Section */}
         <div>
           <h4 className="text-xl font-bold mb-4">Learn More</h4>
           <div className="space-y-2">
@@ -37,8 +34,6 @@ const ChefifyFooter = () => {
             <a href="#" className="block text-gray-400 hover:text-white">FAQ</a>
           </div>
         </div>
-
-        {/* Recipes Section */}
         <div>
           <h4 className="text-xl font-bold mb-4">Recipes</h4>
           <div className="space-y-2">
@@ -51,8 +46,6 @@ const ChefifyFooter = () => {
             <a href="#" className="block text-gray-400 hover:text-white">Christmas</a>
           </div>
         </div>
-
-        {/* Shop Section */}
         <div>
           <h4 className="text-xl font-bold mb-4">Shop</h4>
           <div className="space-y-2">
@@ -61,8 +54,6 @@ const ChefifyFooter = () => {
           </div>
         </div>
       </div>
-
-      {/* Bottom Bar */}
       <div className="container mx-auto px-4 mt-8 pt-4 border-t border-gray-800 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <img 
