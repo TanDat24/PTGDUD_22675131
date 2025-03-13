@@ -3,6 +3,7 @@ import { Search, User, ShoppingCart } from "lucide-react";
 import images from "../assets/image";
 import { useCart } from "./CartContext";
 import ModelCart from "../model/ModelCart";
+import { Link } from "react-router-dom";
 const ChefifyHeader = () => {
     const { cartItems } = useCart();
     const [searchTerm, setSearchTerm] = useState("");
@@ -10,7 +11,7 @@ const ChefifyHeader = () => {
     const [isCartOpen, setIsCartOpen] = useState(false);
     useEffect(() => {
         const fetchHeader = () => {
-            fetch("https://67c81ffe0acf98d07084fcd9.mockapi.io/apiHeader")
+            fetch("https://67d23e3290e0670699bcc2c3.mockapi.io/da/header")
                 .then((response) => response.json())
                 .then((data) => setHeaderData(data))
                 .catch((error) => console.error("Error fetching data:", error));
@@ -76,7 +77,7 @@ const ChefifyHeader = () => {
                             </button>
                             <button className="bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-pink-600 flex items-center space-x-2">
                                 <User size={20} />
-                                <span>Your Recipe Box</span>
+                                <Link>Your Recipe Box</Link>
                             </button>
                         </div>
                     </nav>

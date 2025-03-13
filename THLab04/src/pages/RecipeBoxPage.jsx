@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Heart, Star } from "lucide-react";
 import images from "../assets/image";
 import { useCart } from "../components/CartContext";
+import Cart from "../components/Cart";
 
 const recipes = [
     {
@@ -134,58 +135,17 @@ const RecipeBoxPage = () => {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {filteredRecipes.map((recipe) => (
-                    <motion.div
-                        key={recipe.id}
-                        className="bg-white rounded-lg shadow-md overflow-hidden"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <div className="relative">
-                            <img
-                                src={recipe.image}
-                                alt={recipe.title}
-                                className="w-full h-48 object-cover"
-                            />
-                            <button
-                                onClick={() => toggleFavorite(recipe.id)}
-                                className="absolute top-2 right-2 bg-white/70 rounded-full p-2"
-                            >
-                                <Heart
-                                    size={24}
-                                    className={`${
-                                        favoriteRecipes.includes(recipe.id)
-                                            ? "text-red-500 fill-current"
-                                            : "text-gray-500"
-                                    }`}
-                                />
-                            </button>
-                        </div>
-                        <div className="p-4">
-                            <h3 className="font-semibold text-gray-800">
-                                {recipe.title}
-                            </h3>
-                            <div className="flex items-center justify-between mt-2">
-                                <div className="flex items-center">
-                                    <div
-                                        className="text-yellow-500 mr-1"
-                                        size={16}
-                                    />
-                                    <span className="text-gray-600">
-                                        {recipe.rating}
-                                    </span>
-                                </div>
-                                <span className="text-gray-500 text-sm">
-                                    <button
-                                        type="button"
-                                        className="bg-[#f6339a] text-xl text-white p-2 w-ful pl-2 pr-2 rounded"
-                                        onClick={() => addToCart(recipe)}
-                                    >
-                                        Thêm
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-                    </motion.div>
+                    <div key={recipe.id}>
+                        <Cart
+                            image={recipe.image}
+                            title={recipe.title}
+                            time={recipe.rating}
+                            recipeId={recipe.id}
+                            toggleFavorite={toggleFavorite}
+                            isFavorite={favoriteRecipes.includes(recipe.id)}
+                            addToCart={() => addToCart(recipe)}
+                        />
+                    </div>
                 ))}
             </div>
             <div className="flex justify-center items-center space-x-4 mt-8 bg-gray-100 rounded-full p-2 w-64 mx-auto">
