@@ -1,56 +1,47 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import PenIcon from "../assets/img/pen-svgrepo-com.svg";
 
 const DetailedReport = () => {
-    const orders = [
-        {
-            id: 1,
-            customer: "Elizabeth Lee",
-            company: "AvatarSystems",
-            value: "$359",
-            date: "10/07/2023",
-            status: "New",
-        },
-        {
-            id: 2,
-            customer: "Carlos Garcia",
-            company: "SmoozeShift",
-            value: "$747",
-            date: "24/07/2023",
-            status: "New",
-        },
-        {
-            id: 3,
-            customer: "Elizabeth Bailey",
-            company: "Prime Time Telecom",
-            value: "$564",
-            date: "08/08/2023",
-            status: "In-progress",
-        },
-        {
-            id: 4,
-            customer: "Ryan Brown",
-            company: "OmniTech Corporation",
-            value: "$541",
-            date: "31/08/2023",
-            status: "In-progress",
-        },
-        {
-            id: 5,
-            customer: "Ryan Young",
-            company: "DataStream Inc.",
-            value: "$769",
-            date: "01/05/2023",
-            status: "Completed",
-        },
-        {
-            id: 6,
-            customer: "Hailey Adams",
-            company: "FlowRush",
-            value: "$922",
-            date: "10/06/2023",
-            status: "Completed",
-        },
-    ];
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ordersPerPage = 6;
+
+    const indexOfLastOrder = currentPage * ordersPerPage;
+    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+    const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+    const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+    // Handle page changes
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    // Generate page numbers array
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+    }
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
+    const fetchOrders = async () => {
+        try {
+            const response = await fetch(
+                "https://67e2d7ea97fc65f53537d5eb.mockapi.io/baithi"
+            );
+            const data = await response.json();
+            setOrders(data);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+            setLoading(false);
+        }
+    };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -64,6 +55,10 @@ const DetailedReport = () => {
                 return "bg-gray-100 text-gray-600";
         }
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
@@ -105,7 +100,7 @@ const DetailedReport = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                        {orders.map((order) => (
+                        {currentOrders.map((order) => (
                             <tr key={order.id}>
                                 <td className="px-6 py-4">
                                     <input
@@ -115,16 +110,20 @@ const DetailedReport = () => {
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center">
-                                        <div className="w-8 h-8 bg-gray-200 rounded-full mr-3"></div>
-                                        {order.customer}
+                                        <img
+                                            src={order.customer.avatar}
+                                            alt={order.customer}
+                                            className="w-8 h-8 rounded-full mr-3"
+                                        />
+                                        <div>{order.customer.customerName}</div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-gray-500">
                                     {order.company}
                                 </td>
-                                <td className="px-6 py-4">{order.value}</td>
+                                <td className="px-6 py-4">${order.value}</td>
                                 <td className="px-6 py-4 text-gray-500">
-                                    {order.date}
+                                    {new Date(order.date).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-4">
                                     <span
@@ -137,7 +136,13 @@ const DetailedReport = () => {
                                 </td>
                                 <td className="px-6 py-4">
                                     <button className="text-gray-400 hover:text-gray-600">
-                                        ✏️
+                                        <img
+                                            src={PenIcon}
+                                            alt="Edit"
+                                            width="16"
+                                            height="16"
+                                            className="transition-colors"
+                                        />
                                     </button>
                                 </td>
                             </tr>
@@ -145,21 +150,36 @@ const DetailedReport = () => {
                     </tbody>
                 </table>
                 <div className="px-6 py-4 flex items-center justify-between border-t">
-                    <p className="text-sm text-gray-500">63 results</p>
+                    <p className="text-sm text-gray-500">
+                        {orders.length} results
+                    </p>
                     <div className="flex space-x-2">
-                        <button className="w-8 h-8 flex items-center justify-center rounded-lg">
+                        <button
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
                             ←
                         </button>
-                        <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-pink-500 text-white">
-                            1
-                        </button>
-                        <button className="w-8 h-8 flex items-center justify-center rounded-lg">
-                            2
-                        </button>
-                        <button className="w-8 h-8 flex items-center justify-center rounded-lg">
-                            3
-                        </button>
-                        <button className="w-8 h-8 flex items-center justify-center rounded-lg">
+                        {pageNumbers.map((number) => (
+                            <button
+                                key={number}
+                                className={`w-8 h-8 flex items-center justify-center rounded-lg 
+                                    ${
+                                        currentPage === number
+                                            ? "bg-pink-500 text-white"
+                                            : "hover:bg-gray-100"
+                                    }`}
+                                onClick={() => handlePageChange(number)}
+                            >
+                                {number}
+                            </button>
+                        ))}
+                        <button
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
                             →
                         </button>
                     </div>
