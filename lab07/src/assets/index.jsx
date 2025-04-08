@@ -1,5 +1,7 @@
-import logo from "./img/logo.png"
-const images = () => {
-    logo
-}
-export default { images }
+import logo from "./img/logo.png";
+import tryNow from "./img/image.png";
+
+export const images = {
+    logo,
+    tryNow,
+};

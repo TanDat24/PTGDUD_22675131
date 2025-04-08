@@ -1,7 +1,8 @@
-import Home from "./pages/Home";
+import React from "react";
+import Layout from "./components/Layout";
 
 function App() {
-  return (<Home />)
+    return <Layout />;
 }
 
 export default App;
