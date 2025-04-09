@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import PenIcon from "../assets/img/pen-svgrepo-com.svg";
+import EditModal from "../model/EditModal";
+import Overview from "./Overview";
 
 const DetailedReport = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [filterText, setFilterText] = useState("");
+    const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
 
     useEffect(() => {
         fetchOrders();
@@ -24,6 +30,33 @@ const DetailedReport = () => {
         }
     };
 
+    const handleEdit = (order) => {
+        setSelectedOrder(order);
+        setIsModalOpen(true);
+    };
+
+    const handleSave = async (updatedData) => {
+        try {
+            const response = await fetch(
+                `https://67e2d7ea97fc65f53537d5eb.mockapi.io/baithi/${selectedOrder.id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedData),
+                }
+            );
+
+            if (response.ok) {
+                await fetchOrders();
+                setIsModalOpen(false);
+            }
+        } catch (error) {
+            console.error("Error updating order:", error);
+        }
+    };
+
     const getStatusColor = (status) => {
         switch (status) {
             case "New":
@@ -36,6 +69,14 @@ const DetailedReport = () => {
                 return "bg-gray-100 text-gray-600";
         }
     };
+
+    const filteredItems = orders.filter(
+        (item) =>
+            item.customer.customerName
+                ?.toLowerCase()
+                .includes(filterText.toLowerCase()) ||
+            item.company?.toLowerCase().includes(filterText.toLowerCase())
+    );
 
     const columns = [
         {
@@ -86,9 +127,11 @@ const DetailedReport = () => {
         },
         {
             name: "ACTIONS",
-            // eslint-disable-next-line no-unused-vars
             cell: (row) => (
-                <button className="text-gray-400 hover:text-gray-600">
+                <button
+                    className="text-gray-400 hover:text-gray-600"
+                    onClick={() => handleEdit(row)}
+                >
                     <img
                         src={PenIcon}
                         alt="Edit"
@@ -129,14 +172,18 @@ const DetailedReport = () => {
 
     return (
         <div>
+            <Overview />
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Detailed report</h2>
                 <div className="space-x-4">
-                    <button className="px-4 py-2 text-pink-500 border border-pink-500 rounded-lg hover:bg-pink-50">
-                        Import
+                    <button
+                        className="px-4 py-2 text-pink-500 border border-pink-500 rounded-lg hover:bg-pink-50"
+                        onClick={() => handleEdit({})}
+                    >
+                        Edit
                     </button>
                     <button className="px-4 py-2 text-pink-500 border border-pink-500 rounded-lg hover:bg-pink-50">
-                        Export
+                        Add new
                     </button>
                 </div>
             </div>
@@ -144,14 +191,24 @@ const DetailedReport = () => {
             <div className="bg-white rounded-lg overflow-hidden">
                 <DataTable
                     columns={columns}
-                    data={orders}
+                    data={filteredItems}
                     pagination
+                    paginationResetDefaultPage={resetPaginationToggle}
                     progressPending={loading}
                     customStyles={customStyles}
                     selectableRows
                     highlightOnHover
                 />
             </div>
+
+            {isModalOpen && (
+                <EditModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    data={selectedOrder}
+                    onSave={handleSave}
+                />
+            )}
         </div>
     );
 };
