@@ -1,29 +1,10 @@
 import React, { useState, useEffect } from "react";
+import DataTable from "react-data-table-component";
 import PenIcon from "../assets/img/pen-svgrepo-com.svg";
 
 const DetailedReport = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const ordersPerPage = 6;
-
-    const indexOfLastOrder = currentPage * ordersPerPage;
-    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-    const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
-    const totalPages = Math.ceil(orders.length / ordersPerPage);
-
-    // Handle page changes
-    const handlePageChange = (pageNumber) => {
-        if (pageNumber >= 1 && pageNumber <= totalPages) {
-            setCurrentPage(pageNumber);
-        }
-    };
-
-    // Generate page numbers array
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-    }
 
     useEffect(() => {
         fetchOrders();
@@ -56,9 +37,95 @@ const DetailedReport = () => {
         }
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    const columns = [
+        {
+            name: "CUSTOMER NAME",
+            selector: (row) => row.customer.customerName,
+            cell: (row) => (
+                <div className="flex items-center">
+                    <img
+                        src={row.customer.avatar}
+                        alt={row.customer.customerName}
+                        className="w-8 h-8 rounded-full mr-3"
+                    />
+                    <div>{row.customer.customerName}</div>
+                </div>
+            ),
+            sortable: true,
+        },
+        {
+            name: "COMPANY",
+            selector: (row) => row.company,
+            sortable: true,
+        },
+        {
+            name: "ORDER VALUE",
+            selector: (row) => row.value,
+            cell: (row) => `$${row.value}`,
+            sortable: true,
+        },
+        {
+            name: "ORDER DATE",
+            selector: (row) => row.date,
+            cell: (row) => new Date(row.date).toLocaleDateString(),
+            sortable: true,
+        },
+        {
+            name: "STATUS",
+            selector: (row) => row.status,
+            cell: (row) => (
+                <span
+                    className={`px-3 py-1 rounded-full text-sm ${getStatusColor(
+                        row.status
+                    )}`}
+                >
+                    {row.status}
+                </span>
+            ),
+            sortable: true,
+        },
+        {
+            name: "ACTIONS",
+            // eslint-disable-next-line no-unused-vars
+            cell: (row) => (
+                <button className="text-gray-400 hover:text-gray-600">
+                    <img
+                        src={PenIcon}
+                        alt="Edit"
+                        width="16"
+                        height="16"
+                        className="transition-colors"
+                    />
+                </button>
+            ),
+        },
+    ];
+
+    const customStyles = {
+        headRow: {
+            style: {
+                backgroundColor: "#F9FAFB",
+                borderBottom: "1px solid #E5E7EB",
+            },
+        },
+        headCells: {
+            style: {
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                color: "#6B7280",
+                padding: "1rem 1.5rem",
+            },
+        },
+        rows: {
+            style: {
+                fontSize: "0.875rem",
+                padding: "1rem 1.5rem",
+                "&:not(:last-of-type)": {
+                    borderBottom: "1px solid #E5E7EB",
+                },
+            },
+        },
+    };
 
     return (
         <div>
@@ -75,115 +142,15 @@ const DetailedReport = () => {
             </div>
 
             <div className="bg-white rounded-lg overflow-hidden">
-                <table className="w-full">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                                <input type="checkbox" className="rounded" />
-                            </th>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                                CUSTOMER NAME
-                            </th>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                                COMPANY
-                            </th>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                                ORDER VALUE
-                            </th>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                                ORDER DATE
-                            </th>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                                STATUS
-                            </th>
-                            <th className="px-6 py-4"></th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                        {currentOrders.map((order) => (
-                            <tr key={order.id}>
-                                <td className="px-6 py-4">
-                                    <input
-                                        type="checkbox"
-                                        className="rounded"
-                                    />
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center">
-                                        <img
-                                            src={order.customer.avatar}
-                                            alt={order.customer}
-                                            className="w-8 h-8 rounded-full mr-3"
-                                        />
-                                        <div>{order.customer.customerName}</div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 text-gray-500">
-                                    {order.company}
-                                </td>
-                                <td className="px-6 py-4">${order.value}</td>
-                                <td className="px-6 py-4 text-gray-500">
-                                    {new Date(order.date).toLocaleDateString()}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-sm ${getStatusColor(
-                                            order.status
-                                        )}`}
-                                    >
-                                        {order.status}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <button className="text-gray-400 hover:text-gray-600">
-                                        <img
-                                            src={PenIcon}
-                                            alt="Edit"
-                                            width="16"
-                                            height="16"
-                                            className="transition-colors"
-                                        />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className="px-6 py-4 flex items-center justify-between border-t">
-                    <p className="text-sm text-gray-500">
-                        {orders.length} results
-                    </p>
-                    <div className="flex space-x-2">
-                        <button
-                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100"
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                        >
-                            ←
-                        </button>
-                        {pageNumbers.map((number) => (
-                            <button
-                                key={number}
-                                className={`w-8 h-8 flex items-center justify-center rounded-lg 
-                                    ${
-                                        currentPage === number
-                                            ? "bg-pink-500 text-white"
-                                            : "hover:bg-gray-100"
-                                    }`}
-                                onClick={() => handlePageChange(number)}
-                            >
-                                {number}
-                            </button>
-                        ))}
-                        <button
-                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100"
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                        >
-                            →
-                        </button>
-                    </div>
-                </div>
+                <DataTable
+                    columns={columns}
+                    data={orders}
+                    pagination
+                    progressPending={loading}
+                    customStyles={customStyles}
+                    selectableRows
+                    highlightOnHover
+                />
             </div>
         </div>
     );
