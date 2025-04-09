@@ -4,6 +4,10 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./page/Dashboard";
 import Projects from "./page/Projects";
 import Header from "./components/Header";
+import Teams from "./page/Team";
+import Analytics from "./page/Analytics";
+import Messages from "./page/Messages";
+import Integrations from "./page/Integrations";
 
 function App() {
     return (
@@ -16,21 +20,12 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Dashboard />} />
                             <Route path="/projects" element={<Projects />} />
-                            <Route
-                                path="/teams"
-                                element={<div>Teams Page</div>}
-                            />
-                            <Route
-                                path="/analytics"
-                                element={<div>Analytics Page</div>}
-                            />
-                            <Route
-                                path="/messages"
-                                element={<div>Messages Page</div>}
-                            />
+                            <Route path="/teams" element={<Teams />} />
+                            <Route path="/analytics" element={<Analytics />} />
+                            <Route path="/messages" element={<Messages />} />
                             <Route
                                 path="/integrations"
-                                element={<div>Integrations Page</div>}
+                                element={<Integrations />}
                             />
                         </Routes>
                     </main>
