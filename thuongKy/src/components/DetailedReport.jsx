@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import PenIcon from "../assets/img/pen-svgrepo-com.svg";
+import EditModal from "../model/EditModal";
 import Overview from "./Overview";
 
 const DetailedReport = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [filterText, setFilterText] = useState("");
     const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
@@ -25,6 +27,33 @@ const DetailedReport = () => {
         } catch (error) {
             console.error("Error fetching orders:", error);
             setLoading(false);
+        }
+    };
+
+    const handleEdit = (order) => {
+        setSelectedOrder(order);
+        setIsModalOpen(true);
+    };
+
+    const handleSave = async (updatedData) => {
+        try {
+            const response = await fetch(
+                `https://67e2d7ea97fc65f53537d5eb.mockapi.io/baithi/${selectedOrder.id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedData),
+                }
+            );
+
+            if (response.ok) {
+                await fetchOrders();
+                setIsModalOpen(false);
+            }
+        } catch (error) {
+            console.error("Error updating order:", error);
         }
     };
 
@@ -99,7 +128,10 @@ const DetailedReport = () => {
         {
             name: "ACTIONS",
             cell: (row) => (
-                <button className="text-gray-400 hover:text-gray-600">
+                <button
+                    className="text-gray-400 hover:text-gray-600"
+                    onClick={() => handleEdit(row)}
+                >
                     <img
                         src={PenIcon}
                         alt="Edit"
@@ -144,7 +176,10 @@ const DetailedReport = () => {
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Detailed report</h2>
                 <div className="space-x-4">
-                    <button className="px-4 py-2 text-pink-500 border border-pink-500 rounded-lg hover:bg-pink-50">
+                    <button
+                        className="px-4 py-2 text-pink-500 border border-pink-500 rounded-lg hover:bg-pink-50"
+                        onClick={() => handleEdit({})}
+                    >
                         Edit
                     </button>
                     <button className="px-4 py-2 text-pink-500 border border-pink-500 rounded-lg hover:bg-pink-50">
@@ -165,6 +200,15 @@ const DetailedReport = () => {
                     highlightOnHover
                 />
             </div>
+
+            {isModalOpen && (
+                <EditModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    data={selectedOrder}
+                    onSave={handleSave}
+                />
+            )}
         </div>
     );
 };
