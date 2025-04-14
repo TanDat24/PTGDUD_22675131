@@ -35,38 +35,37 @@ const DetailedReport = () => {
         setSelectedOrder(order);
         setIsModalOpen(true);
     };
-
-    const handleSave = async (formData) => {
+    const handleCreate = async (formData) => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://67e2d7ea97fc65f53537d5eb.mockapi.io/baithi/${selectedOrder.id}`,
+                "https://67e2d7ea97fc65f53537d5eb.mockapi.io/baithi",
                 {
-                    method: "PUT",
+                    method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
                         customer: {
                             customerName: formData.customerName,
-                            avatar: selectedOrder.customer.avatar,
+                            avatar: "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/725.jpg", // Avatar mặc định
                         },
                         company: formData.company,
                         value: formData.value,
                         date: formData.date,
-                        status: formData.status,
+                        status: formData.status || "New",
                     }),
                 }
             );
 
             if (!response.ok) {
-                throw new Error("Failed to update order");
+                throw new Error("Failed to create order");
             }
 
             await fetchOrders();
             setIsModalOpen(false);
 
-            toast.success("Order updated successfully!", {
+            toast.success("Order created successfully!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -75,10 +74,59 @@ const DetailedReport = () => {
                 draggable: true,
             });
         } catch (error) {
-            console.error("Error updating order:", error);
-            toast.error("Failed to update order");
+            console.error("Error creating order:", error);
+            toast.error("Failed to create order");
         } finally {
             setLoading(false);
+        }
+    };
+    const handleSave = async (formData) => {
+        if (selectedOrder?.id) {
+            try {
+                setLoading(true);
+                const response = await fetch(
+                    `https://67e2d7ea97fc65f53537d5eb.mockapi.io/baithi/${selectedOrder.id}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            customer: {
+                                customerName: formData.customerName,
+                                avatar: selectedOrder.customer.avatar,
+                            },
+                            company: formData.company,
+                            value: formData.value,
+                            date: formData.date,
+                            status: formData.status,
+                        }),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to update order");
+                }
+
+                await fetchOrders();
+                setIsModalOpen(false);
+
+                toast.success("Order updated successfully!", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+            } catch (error) {
+                console.error("Error updating order:", error);
+                toast.error("Failed to update order");
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            await handleCreate(formData);
         }
     };
 
@@ -207,7 +255,10 @@ const DetailedReport = () => {
                     >
                         Edit
                     </button>
-                    <button className="px-4 py-2 text-pink-500 border border-pink-500 rounded-lg hover:bg-pink-50">
+                    <button
+                        onClick={() => handleEdit({})}
+                        className="px-4 py-2 text-pink-500 border border-pink-500 rounded-lg hover:bg-pink-50"
+                    >
                         Add new
                     </button>
                 </div>

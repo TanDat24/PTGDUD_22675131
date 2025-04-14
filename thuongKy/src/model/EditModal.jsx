@@ -107,7 +107,7 @@ const EditModal = ({ isOpen, onClose, data, onSave }) => {
                             type="submit"
                             className="px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600"
                         >
-                            Save Changes
+                            Save
                         </button>
                     </div>
                 </form>
