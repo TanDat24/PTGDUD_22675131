@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import CartIcon from "../assets/img/cart-shopping-svgrepo-com.svg";
 import DollarIcon from "../assets/img/dollar-symbol-svgrepo-com.svg";
 import ProfileIcon from "../assets/img/profile-circle-svgrepo-com.svg";
@@ -23,50 +23,78 @@ const StatCard = ({ title, value, change, icon, bgColor }) => (
 );
 
 const Overview = () => {
-    const stats = [
-        {
-            title: "Turnover",
-            value: "$92,405",
-            change: 5.39,
-            bgColor: "bg-[#fff0f5]",
-            icon: (
-                <img
-                    src={CartIcon}
-                    width="30"
-                    height="30"
-                    className="transition-colors"
-                />
-            ),
-        },
-        {
-            title: "Profit",
-            value: "$32,218",
-            change: 5.39,
-            bgColor: "bg-[#eff6ff]",
-            icon: (
-                <img
-                    src={DollarIcon}
-                    width="30"
-                    height="30"
-                    className="transition-colors"
-                />
-            ),
-        },
-        {
-            title: "New customer",
-            value: "298",
-            change: 6.84,
-            bgColor: "bg-[#f0f7fd]",
-            icon: (
-                <img
-                    src={ProfileIcon}
-                    width="30"
-                    height="30"
-                    className="transition-colors"
-                />
-            ),
-        },
-    ];
+    const [stats, setStats] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchStats();
+    }, []);
+
+    const fetchStats = async () => {
+        try {
+            const response = await fetch(
+                "https://67e2d7ea97fc65f53537d5eb.mockapi.io/overview"
+            );
+            const data = await response.json();
+
+            const mappedStats = data.map((item) => {
+                let icon, bgColor;
+                switch (item.title.toLowerCase()) {
+                    case "turnover":
+                        icon = CartIcon;
+                        bgColor = "bg-[#fff0f5]";
+                        break;
+                    case "profit":
+                        icon = DollarIcon;
+                        bgColor = "bg-[#eff6ff]";
+                        break;
+                    case "new customer":
+                        icon = ProfileIcon;
+                        bgColor = "bg-[#f0f7fd]";
+                        break;
+                    default:
+                        icon = CartIcon;
+                        bgColor = "bg-[#fff0f5]";
+                }
+
+                return {
+                    ...item,
+                    icon: (
+                        <img
+                            src={icon}
+                            width="30"
+                            height="30"
+                            className="transition-colors"
+                            alt={item.title}
+                        />
+                    ),
+                    bgColor,
+                };
+            });
+
+            setStats(mappedStats);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching stats:", error);
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4">Overview</h2>
+                <div className="grid grid-cols-3 gap-6">
+                    {[1, 2, 3].map((index) => (
+                        <div
+                            key={index}
+                            className="rounded-lg p-6 bg-gray-100 animate-pulse h-32"
+                        />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="mb-8">
