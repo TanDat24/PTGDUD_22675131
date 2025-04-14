@@ -3,7 +3,8 @@ import DataTable from "react-data-table-component";
 import PenIcon from "../assets/img/pen-svgrepo-com.svg";
 import EditModal from "../model/EditModal";
 import Overview from "./Overview";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const DetailedReport = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -35,8 +36,9 @@ const DetailedReport = () => {
         setIsModalOpen(true);
     };
 
-    const handleSave = async (updatedData) => {
+    const handleSave = async (formData) => {
         try {
+            setLoading(true);
             const response = await fetch(
                 `https://67e2d7ea97fc65f53537d5eb.mockapi.io/baithi/${selectedOrder.id}`,
                 {
@@ -44,16 +46,39 @@ const DetailedReport = () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(updatedData),
+                    body: JSON.stringify({
+                        customer: {
+                            customerName: formData.customerName,
+                            avatar: selectedOrder.customer.avatar,
+                        },
+                        company: formData.company,
+                        value: formData.value,
+                        date: formData.date,
+                        status: formData.status,
+                    }),
                 }
             );
 
-            if (response.ok) {
-                await fetchOrders();
-                setIsModalOpen(false);
+            if (!response.ok) {
+                throw new Error("Failed to update order");
             }
+
+            await fetchOrders();
+            setIsModalOpen(false);
+
+            toast.success("Order updated successfully!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
         } catch (error) {
             console.error("Error updating order:", error);
+            toast.error("Failed to update order");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -209,6 +234,7 @@ const DetailedReport = () => {
                     onSave={handleSave}
                 />
             )}
+            <ToastContainer />
         </div>
     );
 };
